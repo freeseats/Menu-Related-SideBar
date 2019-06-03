@@ -1,0 +1,42 @@
+version: "2.1"
+services:
+  menu:
+    image: menuu
+    environment:
+      MYSQL_USER: root
+      MYSQL_HOST: database
+      MYSQL_DATABASE: complete_menu
+      MYSQL_PORT: 3306
+      MYSQL_ROOT_PASSWORD: "Jackie"
+    depends_on: 
+      - 'database'
+      - 'database_seed'
+    build: ./
+    ports:
+      - '3040:3040'
+
+  database_seed:
+    image: dbseed
+    environment:
+      MYSQL_USER: root
+      MYSQL_HOST: database
+      MYSQL_DATABASE: complete_menu
+      MYSQL_PORT: 3306
+      MYSQL_ROOT_PASSWORD: "Jackie"
+    build: ./db
+    depends_on:
+      database:
+        condition: service_healthy
+        
+  database:
+    image: mysql:5.7
+    environment:
+        MYSQL_HOST: database
+        MYSQL_ROOT_PASSWORD: "Jackie"
+        MYSQL_DATABASE: complete_menu
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 3
+    ports:
+        - 3306:3306
